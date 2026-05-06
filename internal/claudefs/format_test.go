@@ -50,6 +50,9 @@ func TestDecodePathFS(t *testing.T) {
 
 		// /private/tmp path
 		{"private tmp", "-private-tmp", "/private/tmp"},
+
+		// Underscore in directory name (e.g. C_claude)
+		{"underscore dir", "-Users-arvyanh-Documents-notes-C-claude", "/Users/arvyanh/Documents/notes/C_claude"},
 	}
 
 	for _, tt := range tests {
@@ -76,28 +79,33 @@ func TestBuildCandidates(t *testing.T) {
 	}{
 		{
 			segments:  []string{"github", "com"},
-			expectLen: 2,
-			contains:  []string{"github.com", "github-com"},
+			expectLen: 3,
+			contains:  []string{"github.com", "github-com", "github_com"},
 		},
 		{
 			segments:  []string{"ta", "admin", "service"},
-			expectLen: 4,
-			contains:  []string{"ta-admin-service", "ta.admin.service", "ta.admin-service", "ta-admin.service"},
+			expectLen: 9,
+			contains:  []string{"ta-admin-service", "ta.admin.service", "ta.admin-service", "ta-admin.service", "ta_admin_service"},
 		},
 		{
 			segments:  []string{"", "claude"},
-			expectLen: 2,
-			contains:  []string{".claude", "-claude"},
+			expectLen: 3,
+			contains:  []string{".claude", "-claude", "_claude"},
 		},
 		{
 			segments:  []string{"example", "go", "com"},
-			expectLen: 4,
+			expectLen: 9,
 			contains:  []string{"example-go.com", "example.go.com", "example-go-com", "example.go-com"},
 		},
 		{
 			segments:  []string{"support", "sd"},
-			expectLen: 2,
-			contains:  []string{"support-sd", "support.sd"},
+			expectLen: 3,
+			contains:  []string{"support-sd", "support.sd", "support_sd"},
+		},
+		{
+			segments:  []string{"C", "claude"},
+			expectLen: 3,
+			contains:  []string{"C-claude", "C.claude", "C_claude"},
 		},
 	}
 

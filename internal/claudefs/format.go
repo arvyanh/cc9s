@@ -107,8 +107,9 @@ func DecodePathFS(encodedPath string) string {
 }
 
 // buildCandidates generates all possible directory name candidates for a group of segments.
-// Each pair of adjacent segments tries "." and "-" as separators, producing 2^(n-1) combinations.
+// Each pair of adjacent segments tries "-", ".", and "_" as separators, producing 3^(n-1) combinations.
 func buildCandidates(segments []string) []string {
+	const seps = "-._"
 	n := len(segments)
 	if n == 0 {
 		return nil
@@ -121,17 +122,19 @@ func buildCandidates(segments []string) []string {
 	}
 
 	numSeps := n - 1
-	candidates := make([]string, 0, 1<<uint(numSeps))
+	total := 1
+	for i := 0; i < numSeps; i++ {
+		total *= len(seps)
+	}
+	candidates := make([]string, 0, total)
 
-	for mask := 0; mask < (1 << uint(numSeps)); mask++ {
+	for mask := 0; mask < total; mask++ {
 		var b strings.Builder
+		rem := mask
 		for i, s := range segments {
 			if i > 0 {
-				if mask&(1<<uint(i-1)) != 0 {
-					b.WriteByte('.')
-				} else {
-					b.WriteByte('-')
-				}
+				b.WriteByte(seps[rem%len(seps)])
+				rem /= len(seps)
 			}
 			b.WriteString(s)
 		}

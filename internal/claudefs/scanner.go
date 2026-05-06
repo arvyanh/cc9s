@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -339,6 +340,11 @@ func getActiveSessionMarkers(homeDir string) map[string]activeSessionInfo {
 			continue
 		}
 
+		// Skip markers whose process is no longer alive.
+		if info.PID > 0 && !isPIDAlive(info.PID) {
+			continue
+		}
+
 		info.MarkerPath = filePath
 
 		// Record the newest marker for each session ID.
@@ -351,6 +357,12 @@ func getActiveSessionMarkers(homeDir string) map[string]activeSessionInfo {
 	}
 
 	return activeMarkers
+}
+
+// isPIDAlive returns true if the process with the given PID is still running.
+func isPIDAlive(pid int) bool {
+	// On Unix, kill(pid, 0) succeeds iff the process exists and is reachable.
+	return syscall.Kill(pid, 0) == nil
 }
 
 func hasActiveMarker(activeMarkers map[string]activeSessionInfo, sessionID string) bool {
