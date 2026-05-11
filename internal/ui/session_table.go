@@ -49,7 +49,7 @@ func renderSessionTable(sessions []claudefs.GlobalSession, cursor, width, height
 		projectWidth = 20
 	}
 
-	idWidth := 12
+	idWidth := 32
 	statusWidth := 13
 	recommendWidth := 10
 	lastActiveWidth := 14
@@ -143,9 +143,19 @@ func renderSessionTable(sessions []claudefs.GlobalSession, cursor, width, height
 			rowStyle = styles.TableCellStyle.Faint(true)
 		}
 
-		// Format session ID
+		// Format session ID (prefix with name if set)
 		sessionID := gs.Session.ID
-		if len(sessionID) > idWidth {
+		if gs.Session.Name != "" {
+			plain := "[" + gs.Session.Name + "] " + sessionID
+			if len(plain) > idWidth {
+				plain = plain[:idWidth-3] + "..."
+			}
+			nameEnd := len("[" + gs.Session.Name + "]")
+			if nameEnd > len(plain) {
+				nameEnd = len(plain)
+			}
+			sessionID = lipgloss.NewStyle().Foreground(styles.ColorWarning).Render(plain[:nameEnd]) + plain[nameEnd:]
+		} else if len(sessionID) > idWidth {
 			sessionID = sessionID[:idWidth-3] + "..."
 		}
 

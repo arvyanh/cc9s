@@ -12,6 +12,7 @@ import (
 
 type sessionInspection struct {
 	Summary string
+	Name    string
 	Health  SessionHealth
 }
 
@@ -415,6 +416,10 @@ func inspectSessionFile(filePath string) sessionInspection {
 
 		eventType, _ := event["type"].(string)
 		switch eventType {
+		case "custom-title":
+			if title, ok := event["customTitle"].(string); ok && title != "" {
+				inspection.Name = title
+			}
 		case "user":
 			isMeta, _ := event["isMeta"].(bool)
 			if !isMeta {
@@ -429,7 +434,7 @@ func inspectSessionFile(filePath string) sessionInspection {
 			assistantEvents++
 		}
 
-		if totalLines >= 200 && hasSessionMeta && (userEvents > 0 || assistantEvents > 0) {
+		if totalLines >= 200 && hasSessionMeta && (userEvents > 0 || assistantEvents > 0) && inspection.Name != "" {
 			break
 		}
 	}

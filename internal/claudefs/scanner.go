@@ -287,6 +287,7 @@ func LoadProjectSessions(projectEncodedPath string) ([]Session, error) {
 			HasActiveMarker: hasMarker,
 			IsActive:        lifecycle.State == SessionLifecycleActive,
 			Lifecycle:       lifecycle,
+			Name:            inspection.Name,
 			Summary:         inspection.Summary,
 		})
 	}

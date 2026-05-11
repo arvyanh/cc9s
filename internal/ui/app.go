@@ -900,6 +900,7 @@ func (a *AppModel) resolveFooterContext() FooterContext {
 	// Multi-select state
 	if a.sessionList != nil {
 		ctx.HasMulti = a.sessionList.HasSelection()
+		ctx.FilterNamedOnly = a.sessionList.filterNamedOnly
 	}
 
 	// Overlay priority: Dialog > Help > Detail > Log

@@ -40,6 +40,7 @@ type SessionListModel struct {
 	restoreSessionID string
 	restoreCursor    int
 	showCleanupHints bool
+	filterNamedOnly  bool
 	lastWidth        int // last rendered width from View()
 }
 
@@ -210,6 +211,12 @@ func (m *SessionListModel) Update(msg tea.Msg) tea.Cmd {
 				m.updateViewportContent()
 				EnsureLineVisible(&m.viewport, m.cursor)
 			}
+
+		// Toggle named-only filter
+		case "n":
+			m.filterNamedOnly = !m.filterNamedOnly
+			m.applySearchFilter()
+			m.updateViewportContent()
 
 		// Sort shortcuts
 		case "s":
@@ -411,15 +418,26 @@ func (m *SessionListModel) applyContext() {
 
 // applySearchFilter applies search filter on contextSessions -> sessions
 func (m *SessionListModel) applySearchFilter() {
+	source := m.contextSessions
+	if m.filterNamedOnly {
+		var named []claudefs.GlobalSession
+		for _, gs := range source {
+			if gs.Session.Name != "" {
+				named = append(named, gs)
+			}
+		}
+		source = named
+	}
+
 	if m.filterQuery == "" {
-		m.sessions = m.contextSessions
+		m.sessions = source
 		m.clampCursor()
 		return
 	}
 
 	q := normalizeSearchQuery(m.filterQuery)
 	var filtered []claudefs.GlobalSession
-	for _, gs := range m.contextSessions {
+	for _, gs := range source {
 		if m.matchesFilter(gs, q) {
 			filtered = append(filtered, gs)
 		}
@@ -487,6 +505,9 @@ func (m *SessionListModel) matchesFilter(gs claudefs.GlobalSession, q string) bo
 	}
 
 	if strings.Contains(strings.ToLower(s.ID), q) {
+		return true
+	}
+	if strings.Contains(strings.ToLower(s.Name), q) {
 		return true
 	}
 	if strings.Contains(strings.ToLower(gs.ProjectName), q) {
