@@ -62,6 +62,7 @@ type Session struct {
 	HasActiveMarker bool                     // Whether a raw active marker exists in ~/.claude/sessions/*.json
 	IsActive        bool                     // Whether the session is currently active under lifecycle rules
 	Lifecycle       SessionLifecycleSnapshot // Shared lifecycle snapshot for all session-facing surfaces
+	Name            string                   // Custom session name set via /rename
 	Summary         string                   // Session summary (first 80 chars of the first user message)
 }
 

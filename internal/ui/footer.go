@@ -34,7 +34,8 @@ type FooterContext struct {
 	Mode          FooterMode
 	Overlay       OverlayType
 	DialogIsAlert bool
-	HasMulti      bool
+	HasMulti        bool
+	FilterNamedOnly bool
 }
 
 // KeyHint keyboard shortcut hint

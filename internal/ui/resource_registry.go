@@ -121,6 +121,11 @@ func newResourceRegistry() *ResourceRegistry {
 				if ctx.Descriptor.Capabilities.SupportsAllContextShortcut {
 					hints = append(hints, KeyHint{Key: "0", Label: "All ctx"})
 				}
+				if ctx.FilterNamedOnly {
+					hints = append(hints, KeyHint{Key: "n", Label: "Named [on]"})
+				} else {
+					hints = append(hints, KeyHint{Key: "n", Label: "Named"})
+				}
 				hints = append(hints, KeyHint{Key: "?", Label: "Help"})
 				return hints
 			},
